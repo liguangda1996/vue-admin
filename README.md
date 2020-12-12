@@ -1,7 +1,7 @@
 # 基于Vue + ElementUI的后台管理
 
 ## 安装所有依赖
-    npm config set registry http://registry.npmjs.org
+    npm i node-sass 
     npm install
 
 ## 修改element-ui的打包文件
