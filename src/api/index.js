@@ -6,6 +6,7 @@ export {default as category} from './category'
 export {default as clientUser} from './clientUser'
 export {default as order} from './order'
 export {default as tratemark} from './product/tratemark'
+export {default as attrs } from "./product/attrs"
 
 /*
   {

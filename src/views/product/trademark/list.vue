@@ -1,8 +1,12 @@
 <template>
   <div>
     <!-- 添加按钮 -->
-    <el-button type="primary" icon="el-icon-plus" @click="dialogVisible = true">添加</el-button>
-    <el-dialog title="添加品牌" :visible.sync="dialogVisible" width="50%">
+    <el-button type="primary" icon="el-icon-plus" @click="add">添加</el-button>
+    <el-dialog
+      :title="`${tradeMarkForm.id ? '修改' :'添加' }品牌`"
+      :visible.sync="dialogVisible"
+      width="50%"
+    >
       <span>
         <el-form :model="tradeMarkForm" :rules="rules" ref="tradeMarkForm" label-width="100px">
           <el-form-item label="品牌名称" prop="tmName">
@@ -30,7 +34,12 @@
     </el-dialog>
 
     <!-- 品牌信息表格 -->
-    <el-table :data="trademarkList" border style="width: 100%;margin-top:20px">
+    <el-table
+      :data="trademarkList.filter(data => !search || data.tmName.toLowerCase().includes(search.toLowerCase()))"
+      v-loading="loading"
+      border
+      style="width: 100%;margin-top:20px"
+    >
       <el-table-column type="index" label="序号" width="100" align="center"></el-table-column>
       <el-table-column prop="tmName" label="品牌名称"></el-table-column>
       <el-table-column label="品牌LOGO">
@@ -38,7 +47,10 @@
           <img :src="scope.row.logoUrl" class="trademark-img" />
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column>
+        <template slot="header" slot-scope="scope">
+          <el-input v-model="search" size="mini" placeholder="输入关键字搜索" />
+        </template>
         <template slot-scope="scope">
           <el-button type="warning" icon="el-icon-edit" @click="update(scope.row)">修改</el-button>
           <el-button type="danger" icon="el-icon-delete" @click="remove(scope.row.id)">删除</el-button>
@@ -69,22 +81,24 @@ export default {
       limit: 5,
       total: 0,
       dialogVisible: false, // 添加按钮 弹框使用的
+      loading: false,
       tradeMarkForm: {
         tmName: "",
-        logoUrl: "",
-        id: ""
+        logoUrl: ""
       },
       rules: {
         tmName: [
           { required: true, message: "请输入商品名称", trigger: "blur" }
         ],
         logoUrl: [{ required: true, message: "请添加商品LOGO" }]
-      }
+      },
+      search: "" // 搜索数据
     };
   },
   methods: {
     // 获取商品品牌信息
     async getPageList(page, limit) {
+      this.loading = true;
       const result = await this.$API.tratemark.getPageList(page, limit);
       if (result.code === 200) {
         this.$message.success("获取品牌分页列表成功");
@@ -95,12 +109,23 @@ export default {
       } else {
         this.$message.error("获取品牌分页列表失败");
       }
+      this.loading = false;
     },
     handleSizeChange(limit) {
       this.getPageList(1, limit); // 每次改变数据条数，就回到第一页
     },
     handleCurrentChange(page) {
       this.getPageList(page, this.limit);
+    },
+    // 添加按钮
+    add() {
+      // 清空校验
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate();
+      this.dialogVisible = true;
+      this.tradeMarkForm = {
+        tmName: "",
+        logoUrl: ""
+      }; //从修改 --> 到添加 要清空添加时的数据
     },
     // 商品LOGO上传成功的回调
     handleAvatarSuccess(res) {
@@ -122,27 +147,36 @@ export default {
       }
       return isTypes && isLimit;
     },
-    //提交表单
+    //提交表单 （提交按钮绑定的事件）
     submitForm(form) {
       // this.$API.tratemark.addTrateMark(data)
       this.$refs[form].validate(async valid => {
         if (valid) {
-          console.log(this.tradeMarkForm);
-          if (this.tradeMarkForm.id) {
+          //console.log(this.tradeMarkForm);
+          const { tradeMarkForm, trademarkList } = this;
+          const isUpdate = this.tradeMarkForm.id; // 看是否有id
+          let result;
+          if (isUpdate) {
             // 如果有商品id 那么就要执行修改请求 因为点击修改商品信息的按钮 能够获取到当前商品的id
-            var result = await this.$API.tratemark.updateTrateMark(
-              this.tradeMarkForm
-            );
-            console.log(result);
+
+            //console.log(result);
+            const tm = trademarkList.find(tm => tm.id === tradeMarkForm.id);
+            if (
+              // 判断数据是否修改
+              tm.tmName === tradeMarkForm.tmName &&
+              tm.logoUrl === tradeMarkForm.logoUrl
+            ) {
+              this.$message.warning("不能提交未修改的数据");
+              return;
+            }
+            result = await this.$API.tratemark.updateTrateMark(tradeMarkForm);
           } else {
             // 没有id就执行 添加请求 因为添加时并不需要商品id
-            var result = await this.$API.tratemark.addTrateMark(
-              this.tradeMarkForm
-            );
+            result = await this.$API.tratemark.addTrateMark(tradeMarkForm);
           }
 
           if (result.code === 200) {
-            this.$message.success("添加品牌数据成功");
+            this.$message.success(`${isUpdate ? "修改" : "添加"}品牌数据成功`);
             this.dialogVisible = false; // 隐藏对话框
             this.getPageList(this.page, this.limit); // 请求加载新数据
           } else {
@@ -152,7 +186,7 @@ export default {
       });
     },
     // 删除商品功能
-    async remove(id) {
+    remove(id) {
       /* console.log("index",index); // index 为数组下标 row 里面是这一行的信息
       console.log("row",row); */
 
@@ -178,10 +212,13 @@ export default {
     },
     // 修改商品数据功能
     async update(row) {
-      this.tradeMarkForm.logoUrl = row.logoUrl; // 获取当前图片
-      this.tradeMarkForm.tmName = row.tmName; // 获取当前的商品名称
+      // 清空校验
+      this.$refs.tradeMarkForm && this.$refs.tradeMarkForm.clearValidate();
       this.dialogVisible = true;
-      this.tradeMarkForm.id = row.id;
+      /* this.tradeMarkForm.logoUrl = row.logoUrl; // 获取当前图片
+      this.tradeMarkForm.tmName = row.tmName; // 获取当前的商品名称
+      this.tradeMarkForm.id = row.id; */
+      this.tradeMarkForm = { ...row };
     }
   },
   mounted() {
