@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card>
-      <Category @change="getAttrList" :disabled="isShow" />
+      <Category :disabled="!isShow" />
     </el-card>
     <!-- 添加属性 -->
     <el-card v-show="isShow" style="margin-top:20px">
@@ -42,7 +42,12 @@
         </el-form-item>
       </el-form>
 
-      <el-button type="primary" icon="el-icon-plus" @click="addAttrValue" :disabled="!attr.attrName" >添加属性值</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        @click="addAttrValue"
+        :disabled="!attr.attrName"
+      >添加属性值</el-button>
       <el-table :data="attr.attrValueList" border style="width: 100%;margin:20px 0">
         <el-table-column type="index" label="序号" width="100" align="center"></el-table-column>
         <el-table-column label="属性值名称">
@@ -67,14 +72,18 @@
           </el-popconfirm>
         </el-table-column>
       </el-table>
-      <el-button type="primary" @click="save" :disabled="!attr.attrName || attr.attrValueList.length === 0">保存</el-button>
+      <el-button
+        type="primary"
+        @click="save"
+        :disabled="!attr.attrName || attr.attrValueList.length === 0"
+      >保存</el-button>
       <el-button @click="isShow = true">取消</el-button>
     </el-card>
   </div>
 </template>
 
 <script>
-import Category from "./Category";
+import Category from "@/components/Category";
 
 export default {
   name: "AttrList",
@@ -83,9 +92,9 @@ export default {
       attrList: [],
       attr: {
         attrName: "",
-        attrValueList: [],
-        categoryId: "", // 当前第3级分类ID
-        categoryLevel: 3 // 分类级别
+        attrValueList: []
+        /* categoryId: "", // 当前第3级分类ID
+        categoryLevel: 3 // 分类级别 */
       },
       isShow: true,
       category: {
@@ -96,10 +105,15 @@ export default {
     };
   },
   methods: {
+    // 切换id时清空数据
+    clearattrList() {
+      this.attrList = [];
+      this.category.category3Id = "";
+    },
     // 删除属性
     async delAttrValue(id) {
       const result = await this.$API.attrs.delAttrInfo(id);
-      this.$message.warning(result.message || "删除属性成功");
+      this.$message.success(result.message || "删除属性成功");
       this.getAttrList(this.category);
     },
     // 判断输入框中是否为空，为空就删除
@@ -127,15 +141,16 @@ export default {
     },
     // 添加属性按钮 事件
     addAttr() {
+      // 重置数据
       this.attr = {
-        attrName: '', // 属性名
+        attrName: "", // 属性名
         attrValueList: [], // 属性值列表
         categoryId: this.category.category3Id, // 当前第3级分类ID
-        categoryLevel: 3, // 分类级别
-      }
-      /* this.attr.attrName= "";
-      this.attr.attrValueList=[];
-      this.attr.categoryId= this.category3Id;
+        categoryLevel: 3 // 分类级别
+      };
+      /* this.attr.attrName = "";
+      this.attr.attrValueList =[];
+      this.attr.categoryId= this.category.category3Id;
       this.attr.categoryLevel=3; */
       this.isShow = false;
     },
@@ -173,6 +188,15 @@ export default {
         this.$message.error(result.message);
       }
     }
+  },
+  mounted() {
+    this.$bus.$on("change", this.getAttrList);
+    this.$bus.$on("clear", this.clearattrList);
+  },
+  beforeDestroy() {
+    // 通常情况下：清除绑定的全局事件
+    this.$bus.$off("change", this.getAttrList);
+    this.$bus.$off("clear", this.clearattrList);
   },
   components: {
     Category

@@ -2,30 +2,30 @@
   <div>
     <!-- 三级分类 -->
 
-      <el-form inline :model="category" >
-        <el-form-item label="一级分类">
-          <el-select v-model="category.category1Id" @change="handleSelecet1" placeholder="请选择">
-            <el-option v-for="c1 in category1List" :key="c1.id" :label="c1.name" :value="c1.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="二级分类">
-          <el-select v-model="category.category2Id" @change="handleSelecet2" placeholder="请选择">
-            <el-option v-for="c2 in category2List" :label="c2.name" :key="c2.id" :value="c2.id"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="三级分类">
-          <el-select v-model="category.category3Id" @change="handleSelecet3" placeholder="请选择">
-            <el-option v-for="c3 in category3List" :key="c3.id" :label="c3.name" :value="c3.id"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-
+    <el-form inline :model="category" >
+      <el-form-item label="一级分类" >
+        <el-select v-model="category.category1Id" @change="handleSelecet1" placeholder="请选择" :disabled="disabled">
+          <el-option v-for="c1 in category1List" :key="c1.id" :label="c1.name" :value="c1.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="二级分类" >
+        <el-select v-model="category.category2Id" @change="handleSelecet2" placeholder="请选择" :disabled="disabled">
+          <el-option v-for="c2 in category2List" :label="c2.name" :key="c2.id" :value="c2.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="三级分类" >
+        <el-select v-model="category.category3Id" @change="handleSelecet3" placeholder="请选择" :disabled="disabled">
+          <el-option v-for="c3 in category3List" :key="c3.id" :label="c3.name" :value="c3.id"></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
 export default {
   name: "Category",
+  props:["disabled"],
   data() {
     return {
       category: {
@@ -52,6 +52,7 @@ export default {
       } else {
         this.$message.error(result.message);
       }
+      this.$bus.$emit("clear");
     },
     async handleSelecet2(category2Id) {
       this.category.category3Id = "";
@@ -62,6 +63,7 @@ export default {
       } else {
         this.$message.error(result.message);
       }
+      this.$bus.$emit("clear");
     },
     async handleSelecet3(category3Id) {
       const category = {
@@ -69,8 +71,7 @@ export default {
         category3Id
       };
       // 子组件给父组件传递参数 自定义事件
-        this.$emit("change", category);
-
+      this.$bus.$emit("change", category);
     }
   },
   async mounted() {
@@ -81,7 +82,7 @@ export default {
     } else {
       this.$message.error("数据请求失败");
     }
-    console.log(result);
+    //console.log(result);
   }
 };
 </script>

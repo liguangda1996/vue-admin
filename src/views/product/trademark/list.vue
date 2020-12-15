@@ -218,7 +218,7 @@ export default {
       /* this.tradeMarkForm.logoUrl = row.logoUrl; // 获取当前图片
       this.tradeMarkForm.tmName = row.tmName; // 获取当前的商品名称
       this.tradeMarkForm.id = row.id; */
-      this.tradeMarkForm = { ...row };
+      this.tradeMarkForm = { ...row }; // 不能直接this.tradeMarkForm = row，因为这样会让row直接等于this.tradeMarkForm 的引用地址，操作row时，原数据this.tradeMarkForm就会跟着变，造成页面改变
     }
   },
   mounted() {
@@ -229,31 +229,31 @@ export default {
 
 <style lang="sass" scoped>
 .trademark-img
-  width: 80px
+    width: 80px
 .trademark-pagination
-  text-align: right
+    text-align: right
 /deep/.el-pagination__sizes
-  margin-left: 170px
+    margin-left: 170px
 
 >>>.avatar-uploader .el-upload
-  border: 1px dashed #d9d9d9
-  border-radius: 6px
-  cursor: pointer
-  position: relative
-  overflow: hidden
-  &:hover
-    border-color: #409EFF
+    border: 1px dashed #d9d9d9
+    border-radius: 6px
+    cursor: pointer
+    position: relative
+    overflow: hidden
+    &:hover
+        border-color: #409EFF
 
 >>>.avatar-uploader-icon
-  font-size: 28px
-  color: #8c939d
-  width: 178px
-  height: 178px
-  line-height: 178px
-  text-align: center
+    font-size: 28px
+    color: #8c939d
+    width: 178px
+    height: 178px
+    line-height: 178px
+    text-align: center
 
 >>>.avatar
-  width: 178px
-  height: 178px
-  display: block
+    width: 178px
+    height: 178px
+    display: block
 </style>
