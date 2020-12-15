@@ -83,6 +83,26 @@ getBaseSaleAttrList() {
     method: 'GET',
   })
 },
+/*
+ 更新属性内容
+ */
+updateSpuInfo(spu) {
+  return request({
+    url: `${api_name}/updateSpuInfo`,
+    method: 'POST',
+    data:spu
+  })
+},
 
+/*
+ 添加保存属性内容
+ */
+saveSpuInfo(spu) {
+  return request({
+    url: `${api_name}/saveSpuInfo`,
+    method: 'POST',
+    data:spu
+  })
+},
 
 }

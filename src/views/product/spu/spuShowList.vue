@@ -1,17 +1,17 @@
 <template>
   <div>
     <el-card style="margin-top:20px">
-      <el-button type="primary" icon="el-icon-plus">添加SPU</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="addSPU" :disabled="isAddSpu">添加SPU</el-button>
       <el-table :data="spuList" border v-loading="loading" style="width: 100%;margin-top:20px">
         <el-table-column type="index" label="序号" width="100" align="center"></el-table-column>
         <el-table-column prop="spuName" label="SPU名称"></el-table-column>
         <el-table-column label="SPU描述" prop="description"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="{row}">
-            <el-button type="primary" icon="el-icon-plus" size="mini"></el-button>
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="$emit('isShowUpdateList',row)"></el-button>
-            <el-button type="info" icon="el-icon-info" size="mini"></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="primary" icon="el-icon-plus" size="mini" title="添加SKU"></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="$emit('isShowUpdateList',row)" title="修改SPU" ></el-button>
+            <el-button type="info" icon="el-icon-info" size="mini" title="查看所有SKU" ></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" title="删除SPU" ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -44,7 +44,8 @@ export default {
       page: 1,
       limit: 5,
       total: 0,
-      loading: false
+      loading: false,
+      isAddSpu:true,
     };
   },
   methods: {
@@ -66,7 +67,7 @@ export default {
       console.log(result);
 
       if (result.code === 200) {
-        this.loading = false;
+        this.loading = true;
         this.$message.success("SPU数据列表请求成功");
         this.spuList = result.data.records;
         this.page = result.data.current;
@@ -81,6 +82,11 @@ export default {
     handleCategoryChange(category) {
       this.category = category;
       this.getPageList(this.page, this.limit);
+      this.isAddSpu = false; // 获取SPU页面，让其可以点击
+    },
+    // 添加SPU按钮事件
+    addSPU() {
+      this.$emit("isShowUpdateList",this.category)
     }
   },
   mounted() {
