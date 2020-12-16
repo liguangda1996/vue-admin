@@ -8,10 +8,24 @@
         <el-table-column label="SPU描述" prop="description"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="{row}">
-            <el-button type="primary" icon="el-icon-plus" size="mini" title="添加SKU"></el-button>
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="$emit('isShowUpdateList',row)" title="修改SPU" ></el-button>
-            <el-button type="info" icon="el-icon-info" size="mini" title="查看所有SKU" ></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini" title="删除SPU" ></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              title="添加SKU"
+              @click="$emit('isShowSkuForm',{...row, ...category})"
+            ></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="$emit('isShowUpdateList',row)"
+              title="修改SPU"
+            ></el-button>
+            <el-button type="info" icon="el-icon-info" size="mini" title="查看所有SKU"></el-button>
+            <el-popconfirm :title="`确定删除 ${row.spuName} 吗`" @onConfirm="delSpu(row)">
+              <el-button type="danger" icon="el-icon-delete" size="mini" slot="reference" ></el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -45,7 +59,7 @@ export default {
       limit: 5,
       total: 0,
       loading: false,
-      isAddSpu:true,
+      isAddSpu: true
     };
   },
   methods: {
@@ -86,7 +100,12 @@ export default {
     },
     // 添加SPU按钮事件
     addSPU() {
-      this.$emit("isShowUpdateList",this.category)
+      this.$emit("isShowUpdateList", this.category);
+    },
+    // 删除按钮功能
+    delSpu(row) {
+      this.$API.spu.deleteSpu(row.id);
+      this.getPageList(this.page,this.limit);
     }
   },
   mounted() {

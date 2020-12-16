@@ -1,13 +1,19 @@
 <template>
   <div>
-    <!-- 三级分类 -->
-    <Category :disabled="!isShowList"/>
-    <!-- SPU信息列表 -->
-    <SpuShowList v-if="isShowList" @isShowUpdateList="isShowUpdateList" />
-    <!-- 添加spu 信息表格 -->
-    <SpuUpdateList v-else @isShowlist="isShowlist" :spuInfo="spuInfo"  />
-      <!-- sku信息表格 -->
-    <SkuUpdateList />
+    <!-- sku信息表格 -->
+    <skuForm v-if="isShowSku" :spuItem="spuItem" @isShowSkuForm="isShowSkuForm" />
+    <div v-else>
+      <!-- 三级分类 -->
+      <Category :disabled="!isShowList" />
+      <!-- SPU信息列表 -->
+      <SpuShowList
+        v-if="isShowList"
+        @isShowUpdateList="isShowUpdateList"
+        @isShowSkuForm="isShowSkuForm"
+      />
+      <!-- 添加spu 信息表格 -->
+      <SpuUpdateList v-else @isShowlist="isShowlist" :spuInfo="spuInfo" />
+    </div>
   </div>
 </template>
 
@@ -15,23 +21,23 @@
 import Category from "@/components/Category";
 import SpuShowList from "./spuShowList";
 import SpuUpdateList from "./spuUpdateList";
-import SkuUpdateList from "./skuUpdateList";
+import skuForm from "./skuForm";
 
 export default {
   name: "SpuList",
   data() {
     return {
       isShowList: true,
-      isShowSku:false,
+      isShowSku: false,
       spuInfo: {},
-      // categoryId:{},
+      spuItem: {}
     };
   },
   components: {
     Category,
     SpuShowList,
     SpuUpdateList,
-    SkuUpdateList
+    skuForm
   },
   methods: {
     isShowUpdateList(row) {
@@ -41,8 +47,9 @@ export default {
     isShowlist() {
       this.isShowList = true;
     },
-    isShowSkuList() {
-      this.isShowSku = true
+    isShowSkuForm(row) {
+      this.isShowSku = !this.isShowSku;
+      this.spuItem = { ...row };
     }
   },
   mounted() {}

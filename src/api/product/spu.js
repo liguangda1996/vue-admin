@@ -19,11 +19,11 @@ export default {
   /*
 添加商品属性
 */
-  saveSpuInfo(attr) {
+  saveSpuInfo(spuInfo) {
     return request({
       url: `${api_name}/saveAttrInfo`,
       method: 'POST',
-      data: attr,
+      data: spuInfo,
     })
   },
    /*
@@ -104,5 +104,24 @@ saveSpuInfo(spu) {
     data:spu
   })
 },
+
+/*
+ 删除spu
+ */
+deleteSpu(spuId) {
+  return request({
+    url: `${api_name}/deleteSpu/${spuId}`,
+    method: 'DELETE',
+  })
+},
+
+// 保存SKU
+saveSkuInfo(sku){
+return request({
+  url:`${api_name}/saveSkuInfo`,
+  method:'POST',
+  data:sku
+})
+}
 
 }
