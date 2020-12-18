@@ -3,7 +3,7 @@
     <div>
       <el-form :model="sku" label-width="80px">
         <el-form-item label="SPU 名称" prop="spuName">
-          <span>{{sku.spuName}}</span>
+          <span>{{spu.spuName}}</span>
         </el-form-item>
         <el-form-item label="SKU 名称">
           <el-input v-model="sku.skuName"></el-input>
@@ -150,7 +150,10 @@ export default {
       this.$nextTick(() => {
         /* const  category3Id  = this.spu;
         this.$bus.$emit("change", category3Id); */
-        this.$bus.$emit("change", { category3Id: this.spu.category3Id });
+        this.$bus.$emit("change", {
+           category1Id: this.spu.category1Id,
+           category2Id: this.spu.category2Id,
+           category3Id: this.spu.category3Id });
       });
     },
     async saveSpu() {

@@ -19,7 +19,7 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
-              @click="$emit('isShowUpdateList',row)"
+              @click="$emit('isShowUpdateList',{...row, ...category})"
               title="修改SPU"
             ></el-button>
             <el-button type="info" icon="el-icon-info" size="mini" title="查看所有SKU"></el-button>
@@ -106,13 +106,24 @@ export default {
     delSpu(row) {
       this.$API.spu.deleteSpu(row.id);
       this.getPageList(this.page,this.limit);
+      this.$message.success("信息删除成功");
+    },
+    // 当三级分类改变时清空分类信息
+    clesrList() {
+      this.spuList=[],
+      this.page = 1,
+      this.limit = 5,
+      this.total = 0
     }
+
   },
   mounted() {
     this.$bus.$on("change", this.handleCategoryChange);
+    this.$bus.$on("clear", this.clesrList)
   },
   beforeDestroy() {
     this.$bus.$off("change", this.handleCategoryChange);
+    this.$bus.$off("clear", this.clesrList)
   }
 };
 </script>

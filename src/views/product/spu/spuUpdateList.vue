@@ -286,7 +286,10 @@ export default {
       this.$nextTick(() => {
         /* const  category3Id  = this.spu;
         this.$bus.$emit("change", category3Id); */
-        this.$bus.$emit("change", { category3Id: this.spu.category3Id });
+        this.$bus.$emit("change", {
+          category1Id: this.spu.category1Id,
+          category2Id: this.spu.category2Id,
+          category3Id: this.spu.category3Id });
       });
     },
     // 获取全部品牌信息

@@ -1,10 +1,11 @@
 <template>
   <div>
+    <!-- 三级分类 -->
+      <Category :disabled="!isShowList" v-show="!isShowSku"/>
     <!-- sku信息表格 -->
     <skuForm v-if="isShowSku" :spuItem="spuItem" @isShowSkuForm="isShowSkuForm" />
+
     <div v-else>
-      <!-- 三级分类 -->
-      <Category :disabled="!isShowList" />
       <!-- SPU信息列表 -->
       <SpuShowList
         v-if="isShowList"
@@ -14,6 +15,7 @@
       <!-- 添加spu 信息表格 -->
       <SpuUpdateList v-else @isShowlist="isShowlist" :spuInfo="spuInfo" />
     </div>
+
   </div>
 </template>
 
